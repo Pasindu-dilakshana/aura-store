@@ -12,7 +12,7 @@ async function connect() {
   if (process.env.MONGODB_URI) {
     try {
       const { MongoClient } = require('mongodb');
-      const client = new MongoClient(process.env.MONGODB_URI);
+      const client = new MongoClient(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000 });
       await client.connect();
       const db = client.db('aura');
       collection = db.collection('store');
