@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: aura-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false          # You will paste this from MongoDB Atlas
+      - key: ADMIN_EMAIL
+        value: admin@aura.store
+      - key: ADMIN_PASSWORD
+        sync: false          # Set your own secure password
+      - key: FRONTEND_URL
+        sync: false          # You will paste your Vercel URL here

@@ -1,0 +1,46 @@
+╔══════════════════════════════════════════════════════╗
+║           AURA STORE — HOW TO START                  ║
+╚══════════════════════════════════════════════════════╝
+
+You have 2 servers to run. Open TWO terminal windows.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TERMINAL 1 — Backend (run this FIRST)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  cd backend
+  npm install
+  npm run dev
+
+  ✅ Should show: "🚀 AURA Backend running at http://localhost:5000"
+  ✅ Test it: open http://localhost:5000/api/health in browser
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TERMINAL 2 — Frontend (run AFTER backend is started)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  npm install
+  npm run dev
+
+  ✅ Should show: "Local: http://localhost:5173"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADMIN DASHBOARD — No installation needed!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Open the "admin" folder
+  2. Double-click "index.html" to open in browser
+  3. Login with:
+       Email:    admin@aura.store
+       Password: Admin@1234
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+URLs
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Store:   http://localhost:5173
+  API:     http://localhost:5000/api
+  Admin:   admin/index.html (open directly in browser)

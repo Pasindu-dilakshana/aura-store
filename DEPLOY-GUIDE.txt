@@ -1,0 +1,105 @@
+═══════════════════════════════════════════════════
+        AURA STORE — DEPLOYMENT GUIDE
+    Backend: Render  |  Frontend: Vercel
+═══════════════════════════════════════════════════
+
+STEP 1 — MONGODB ATLAS (free database)
+───────────────────────────────────────
+1. Go to https://cloud.mongodb.com and sign up (free)
+2. Click "Build a Cluster" → choose FREE (M0 Sandbox)
+3. Pick any region → click "Create"
+4. Under "Security" → "Database Access" → Add a user
+   - Username: aura
+   - Password: (choose something strong, save it!)
+   - Role: Atlas admin
+5. Under "Security" → "Network Access" → Add IP → click "Allow Access From Anywhere" (0.0.0.0/0)
+6. Go to "Database" → click "Connect" → "Connect your application"
+7. Copy the connection string, it looks like:
+   mongodb+srv://aura:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+8. Replace <password> with your actual password
+9. Add /aura before the ?, so it becomes:
+   mongodb+srv://aura:yourpassword@cluster0.xxxxx.mongodb.net/aura?retryWrites=true&w=majority
+10. SAVE THIS STRING — you need it for Render
+
+STEP 2 — GITHUB (push your code)
+──────────────────────────────────
+1. Go to https://github.com and create a new repository called "aura-store"
+2. Make it Public
+3. On your computer, open terminal in the aura-complete folder:
+   git init
+   git add .
+   git commit -m "Initial AURA store"
+   git remote add origin https://github.com/YOURUSERNAME/aura-store.git
+   git push -u origin main
+
+STEP 3 — RENDER (deploy backend)
+──────────────────────────────────
+1. Go to https://render.com and sign up with GitHub
+2. Click "New +" → "Web Service"
+3. Connect your "aura-store" GitHub repo
+4. Settings:
+   - Name: aura-backend
+   - Root Directory: backend
+   - Runtime: Node
+   - Build Command: npm install
+   - Start Command: node server.js
+5. Click "Advanced" → "Add Environment Variable" and add these one by one:
+   
+   Key: MONGODB_URI
+   Value: (paste your MongoDB string from Step 1)
+   
+   Key: JWT_SECRET
+   Value: (type any long random string, e.g. "aura2024xk92jd8hs73nq")
+   
+   Key: ADMIN_EMAIL
+   Value: admin@aura.store
+   
+   Key: ADMIN_PASSWORD
+   Value: (choose a secure password)
+   
+   Key: FRONTEND_URL
+   Value: (leave blank for now, update after Step 4)
+
+6. Click "Create Web Service"
+7. Wait 2-3 minutes for it to deploy
+8. COPY YOUR RENDER URL — it looks like: https://aura-backend-xxxx.onrender.com
+9. Go back to your service → Environment → add:
+   Key: FRONTEND_URL
+   Value: (your Vercel URL - get from Step 4, come back and update)
+
+STEP 4 — VERCEL (deploy frontend)
+───────────────────────────────────
+1. Go to https://vercel.com and sign up with GitHub
+2. Click "Add New" → "Project"
+3. Select your "aura-store" repo
+4. Settings:
+   - Framework Preset: Vite
+   - Root Directory: ./  (leave as is)
+   - Build Command: npm run build
+   - Output Directory: dist
+5. Click "Environment Variables" and add:
+   
+   Key: VITE_API_URL
+   Value: https://aura-backend-xxxx.onrender.com/api
+          ↑ paste your Render URL from Step 3 + /api
+
+6. Click "Deploy"
+7. Wait 1-2 minutes
+8. COPY YOUR VERCEL URL (e.g. https://aura-store.vercel.app)
+9. Go back to Render → your service → Environment
+   Update FRONTEND_URL with your Vercel URL
+   Click "Save Changes" (it will redeploy automatically)
+
+DONE! 🎉
+────────
+Your store is live at your Vercel URL.
+Admin panel: https://your-store.vercel.app/admin
+Login: admin@aura.store / (your ADMIN_PASSWORD from Step 3)
+
+IMPORTANT NOTES
+────────────────
+• Free Render servers "sleep" after 15 minutes of inactivity.
+  First visit after sleep takes ~30 seconds to wake up.
+  This is normal on the free plan.
+• MongoDB Atlas free tier = 512MB storage (plenty for a clothing store)
+• Data persists forever in MongoDB — no more resets!

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURA Admin Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --olive: #5a6b3d; --olive-light: #7a8c52; --black: #111;
+      --white: #fff; --gray-50: #f9fafb; --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb; --gray-500: #6b7280; --gray-700: #374151;
+      --green: #16a34a; --yellow: #d97706; --red: #dc2626;
+      --blue: #2563eb; --purple: #7c3aed;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-50); color: var(--black); }
+    /* Layout */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: var(--black); color: var(--white); display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; transition: transform 0.3s; }
+    .main { margin-left: 260px; flex: 1; display: flex; flex-direction: column; }
+    .topbar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .content { padding: 28px; flex: 1; }
+    /* Sidebar */
+    .logo { padding: 24px; font-family: Georgia, serif; font-size: 24px; font-weight: 700; letter-spacing: -1px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .logo span { color: var(--olive-light); }
+    .nav-section { padding: 20px 12px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.3); font-weight: 700; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 500; transition: all 0.2s; margin: 2px 8px; }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: var(--white); }
+    .nav-item.active { background: var(--olive); color: var(--white); }
+    .nav-icon { font-size: 18px; width: 20px; text-align: center; }
+    .badge { background: var(--red); color: var(--white); font-size: 11px; padding: 1px 7px; border-radius: 20px; margin-left: auto; font-weight: 700; }
+    /* Page header */
+    .page-header { margin-bottom: 28px; }
+    .page-title { font-size: 26px; font-weight: 700; }
+    .page-sub { color: var(--gray-500); font-size: 14px; margin-top: 4px; }
+    /* Cards */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--white); border-radius: 14px; padding: 22px; border: 1px solid var(--gray-200); }
+    .stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-500); margin-bottom: 10px; }
+    .stat-value { font-size: 32px; font-weight: 700; }
+    .stat-icon { font-size: 28px; float: right; opacity: 0.2; }
+    /* Table */
+    .card { background: var(--white); border-radius: 14px; border: 1px solid var(--gray-200); overflow: hidden; margin-bottom: 24px; }
+    .card-header { padding: 18px 22px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+    .card-title { font-size: 15px; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--gray-50); padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); }
+    td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+    /* Status badges */
+    .badge-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #dbeafe; color: #1e40af; }
+    .badge-processing { background: #ede9fe; color: #5b21b6; }
+    .badge-shipped { background: #e0f2fe; color: #075985; }
+    .badge-delivered { background: #d1fae5; color: #065f46; }
+    .badge-cancelled { background: #fee2e2; color: #991b1b; }
+    .badge-read { background: var(--gray-100); color: var(--gray-500); }
+    .badge-unread { background: #fef3c7; color: #92400e; }
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: var(--black); color: var(--white); }
+    .btn-primary:hover { background: var(--olive); }
+    .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-danger { background: #fee2e2; color: var(--red); }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+    /* Forms */
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 14px; transition: border-color 0.2s; background: var(--white); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--black); }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal { background: var(--white); border-radius: 16px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 10px; }
+    /* Login page */
+    .login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--black); }
+    .login-box { background: var(--white); border-radius: 20px; padding: 44px; width: 380px; }
+    .login-logo { font-family: Georgia, serif; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .login-sub { text-align: center; color: var(--gray-500); font-size: 14px; margin-bottom: 32px; }
+    /* Misc */
+    .search-bar { padding: 9px 14px 9px 36px; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 14px; width: 240px; }
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-500); font-size: 14px; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-500); }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
+    .topbar-title { font-weight: 700; font-size: 15px; }
+    .user-chip { display: flex; align-items: center; gap: 8px; background: var(--gray-100); padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 600; }
+    .product-img { width: 40px; height: 48px; object-fit: cover; border-radius: 6px; }
+    .chart-container { height: 260px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .flex { display: flex; }
+    .gap-2 { gap: 8px; }
+    .items-center { align-items: center; }
+    .ml-auto { margin-left: auto; }
+    .text-green { color: var(--green); }
+    .text-red { color: var(--red); }
+    .text-yellow { color: var(--yellow); }
+    .text-blue { color: var(--blue); }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+    .sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .logout-btn { width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 8px; cursor: pointer; color: rgba(255,255,255,0.6); font-size: 14px; background: none; border: none; font-weight: 500; transition: all 0.2s; }
+    .logout-btn:hover { color: var(--white); background: rgba(220,38,38,0.2); }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .grid2 { grid-template-columns: 1fr; }
+      .input-row { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .loading { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--gray-200); border-top-color: var(--black); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .alert { padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .select-sm { padding: 5px 10px; font-size: 13px; border-radius: 6px; border: 1.5px solid var(--gray-200); cursor: pointer; }
+    select.select-sm:focus { outline: none; border-color: var(--black); }
+    td img { display: block; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .tag-local { background: #ecfdf5; color: #065f46; }
+    .tag-intl { background: #eff6ff; color: #1e40af; }
+  </style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const API = 'http://localhost:5000/api';
+let token = localStorage.getItem('aura_admin_token');
+let currentPage = 'dashboard';
+let pendingCount = 0;
+let unreadCount = 0;
+
+// ─── API HELPERS ─────────────────────────────────────────────────────────────
+async function api(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${API}${path}`, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ─── RENDER ENGINE ───────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  if (!token) { app.innerHTML = renderLogin(); bindLogin(); return; }
+  app.innerHTML = renderShell();
+  loadPage(currentPage);
+  bindNav();
+}
+
+function renderLogin() {
+  return `
+    <div class="login-page">
+      <div class="login-box">
+        <div class="login-logo">AURA<span style="color:var(--olive)">.</span></div>
+        <div class="login-sub">Admin Dashboard</div>
+        <div id="login-err"></div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input id="l-email" type="email" placeholder="admin@aura.store" value="admin@aura.store" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input id="l-pass" type="password" placeholder="••••••••" value="Admin@1234" />
+        </div>
+        <button id="login-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
+          SIGN IN TO DASHBOARD
+        </button>
+      </div>
+    </div>`;
+}
+
+function bindLogin() {
+  document.getElementById('login-btn').onclick = async () => {
+    const email = document.getElementById('l-email').value;
+    const pass = document.getElementById('l-pass').value;
+    const btn = document.getElementById('login-btn');
+    const err = document.getElementById('login-err');
+    btn.innerHTML = '<span class="loading"></span>';
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/auth/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      token = data.token;
+      localStorage.setItem('aura_admin_token', token);
+      render();
+    } catch(e) {
+      err.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+      btn.innerHTML = 'SIGN IN TO DASHBOARD';
+      btn.disabled = false;
+    }
+  };
+  document.getElementById('l-pass').onkeydown = (e) => { if(e.key==='Enter') document.getElementById('login-btn').click(); };
+}
+
+function renderShell() {
+  return `
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">AURA<span>.</span></div>
+      <div class="nav-section">Main</div>
+      <div class="nav-item ${currentPage==='dashboard'?'active':''}" data-page="dashboard"><span class="nav-icon">📊</span>Dashboard</div>
+      <div class="nav-section">Store</div>
+      <div class="nav-item ${currentPage==='products'?'active':''}" data-page="products"><span class="nav-icon">👕</span>Products</div>
+      <div class="nav-item ${currentPage==='orders'?'active':''}" data-page="orders"><span class="nav-icon">📦</span>Orders${pendingCount>0?`<span class="badge">${pendingCount}</span>`:''}</div>
+      <div class="nav-section">Customers</div>
+      <div class="nav-item ${currentPage==='messages'?'active':''}" data-page="messages"><span class="nav-icon">💬</span>Messages${unreadCount>0?`<span class="badge">${unreadCount}</span>`:''}</div>
+      <div class="nav-item ${currentPage==='newsletter'?'active':''}" data-page="newsletter"><span class="nav-icon">📧</span>Newsletter</div>
+      <div class="nav-item ${currentPage==='users'?'active':''}" data-page="users"><span class="nav-icon">👥</span>Users</div>
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout-btn">🚪 Sign Out</button>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;background:none;border:none;cursor:pointer;font-size:20px" id="menu-btn">☰</button>
+          <span class="topbar-title" id="topbar-title">Dashboard</span>
+        </div>
+        <div class="user-chip">👤 Admin</div>
+      </header>
+      <div class="content" id="main-content">
+        <div style="display:flex;justify-content:center;padding:60px"><span class="loading" style="width:32px;height:32px;border-width:3px"></span></div>
+      </div>
+    </main>
+  </div>`;
+}
+
+function bindNav() {
+  document.querySelectorAll('[data-page]').forEach(el => {
+    el.onclick = () => { currentPage = el.dataset.page; render(); };
+  });
+  document.getElementById('logout-btn').onclick = () => {
+    if(confirm('Sign out of admin?')) { token = null; localStorage.removeItem('aura_admin_token'); render(); }
+  };
+  // Show menu btn on mobile
+  if(window.innerWidth < 768) document.getElementById('menu-btn').style.display = 'block';
+}
+
+async function loadPage(page) {
+  const titles = { dashboard:'Dashboard', products:'Products', orders:'Orders', messages:'Messages', newsletter:'Newsletter', users:'Users' };
+  document.getElementById('topbar-title').textContent = titles[page] || page;
+  const c = document.getElementById('main-content');
+  c.innerHTML = `<div style="display:flex;justify-content:center;padding:60px"><span class="loading" style="width:32px;height:32px;border-width:3px"></span></div>`;
+  
+  try {
+    if(page === 'dashboard') await renderDashboard(c);
+    else if(page === 'products') await renderProducts(c);
+    else if(page === 'orders') await renderOrders(c);
+    else if(page === 'messages') await renderMessages(c);
+    else if(page === 'newsletter') await renderNewsletter(c);
+    else if(page === 'users') await renderUsers(c);
+  } catch(e) {
+    c.innerHTML = `<div class="alert alert-error">Failed to load: ${e.message}. Make sure the backend is running at ${API}</div>`;
+  }
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+async function renderDashboard(c) {
+  const stats = await api('/admin/stats');
+  pendingCount = stats.pendingOrders;
+  unreadCount = stats.unreadMessages;
+
+  const orderStatusMap = {};
+  (stats.ordersByStatus||[]).forEach(s => orderStatusMap[s.status] = s.count);
+
+  c.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Welcome back, Admin 👋</div>
+      <div class="page-sub">Here's what's happening with your store today.</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👕</div>
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value">${stats.totalProducts}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">${stats.totalOrders}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" style="font-size:24px">LKR ${(stats.totalRevenue||0).toLocaleString()}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Customers</div>
+        <div class="stat-value">${stats.totalUsers}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-label">Pending Orders</div>
+        <div class="stat-value text-yellow">${stats.pendingOrders}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-label">Unread Messages</div>
+        <div class="stat-value text-red">${stats.unreadMessages}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📧</div>
+        <div class="stat-label">Subscribers</div>
+        <div class="stat-value">${stats.totalSubscribers}</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Orders by Status</span></div>
+        <div class="modal-body"><div class="chart-container"><canvas id="statusChart"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Orders</span>
+          <button class="btn btn-sm btn-secondary" onclick="currentPage='orders';render()">View All</button>
+        </div>
+        <table>
+          <thead><tr><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>
+            ${(stats.recentOrders||[]).map(o=>`
+              <tr>
+                <td><div style="font-weight:600">${o.customer_name}</div><div style="color:var(--gray-500);font-size:12px">${o.customer_email}</div></td>
+                <td>LKR ${o.total.toLocaleString()}</td>
+                <td><span class="badge-status badge-${o.status}">${o.status}</span></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Recent Messages</span>
+        <button class="btn btn-sm btn-secondary" onclick="currentPage='messages';render()">View All</button>
+      </div>
+      <table>
+        <thead><tr><th>From</th><th>Subject</th><th>Date</th><th>Status</th></tr></thead>
+        <tbody>
+          ${(stats.recentMessages||[]).map(m=>`
+            <tr>
+              <td><div style="font-weight:600">${m.name}</div><div style="color:var(--gray-500);font-size:12px">${m.email}</div></td>
+              <td class="truncate">${m.subject}</td>
+              <td style="font-size:12px;color:var(--gray-500)">${new Date(m.created_at).toLocaleDateString()}</td>
+              <td><span class="badge-status ${m.is_read?'badge-read':'badge-unread'}">${m.is_read?'Read':'New'}</span></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  // Chart
+  const ctx = document.getElementById('statusChart').getContext('2d');
+  const labels = Object.keys(orderStatusMap);
+  const data = Object.values(orderStatusMap);
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels.length ? labels : ['No orders'],
+      datasets: [{ data: data.length ? data : [1], backgroundColor: ['#fef3c7','#dbeafe','#ede9fe','#e0f2fe','#d1fae5','#fee2e2','#f3f4f6'], borderWidth: 2, borderColor: '#fff' }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+}
+
+// ─── PRODUCTS ─────────────────────────────────────────────────────────────────
+async function renderProducts(c) {
+  const products = await api('/products');
+  
+  c.innerHTML = `
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="page-title">Products</div>
+        <div class="page-sub">${products.length} products in your store</div>
+      </div>
+      <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
+    </div>
+    <div id="product-alert"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Products</span>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-bar" id="prod-search" placeholder="Search products..." oninput="filterTable('prod-table',this.value,[1,2])" />
+        </div>
+      </div>
+      <table id="prod-table">
+        <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Type</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${products.map(p=>`
+            <tr>
+              <td><img class="product-img" src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/40x48'"/></td>
+              <td><div style="font-weight:600">${p.name}</div><div style="font-size:12px;color:var(--gray-500)">${p.description||''}</div></td>
+              <td>${p.category}</td>
+              <td><span class="tag ${p.type.includes('Local')?'tag-local':'tag-intl'}">${p.type.includes('Local')?'🇱🇰 Local':'🌍 Intl'}</span></td>
+              <td style="font-weight:600">LKR ${p.price.toLocaleString()}</td>
+              <td><span class="badge-status ${p.is_active?'badge-delivered':'badge-cancelled'}">${p.is_active?'Active':'Hidden'}</span></td>
+              <td>
+                <div class="flex gap-2">
+                  <button class="btn btn-sm btn-secondary" onclick='openEditModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Edit</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id},'${p.name}')">Delete</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${renderProductModal()}`;
+}
+
+function renderProductModal(p={}) {
+  const isEdit = !!p.id;
+  return `
+  <div class="modal-overlay" id="product-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-weight:700">${isEdit?'Edit Product':'Add New Product'}</h3>
+        <button onclick="closeProductModal()" style="background:none;border:none;font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-alert"></div>
+        <div class="input-row">
+          <div class="form-group"><label>Product Name *</label><input id="p-name" value="${p.name||''}" placeholder="e.g. Oversized Heavy Tee"/></div>
+          <div class="form-group"><label>Price (LKR) *</label><input id="p-price" type="number" value="${p.price||''}" placeholder="3500"/></div>
+        </div>
+        <div class="input-row">
+          <div class="form-group"><label>Category *</label>
+            <select id="p-cat"><option value="Men" ${p.category==='Men'?'selected':''}>Men</option><option value="Women" ${p.category==='Women'?'selected':''}>Women</option></select>
+          </div>
+          <div class="form-group"><label>Type *</label>
+            <select id="p-type"><option value="Local Brand 🇱🇰" ${(p.type||'').includes('Local')?'selected':''}>Local Brand 🇱🇰</option><option value="International 🌍" ${(p.type||'').includes('International')?'selected':''}>International 🌍</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Image URL *</label><input id="p-img" value="${p.image||''}" placeholder="https://images.unsplash.com/..."/></div>
+        <div class="form-group"><label>Sizes (comma separated) *</label><input id="p-sizes" value="${(p.sizes||[]).join(',')}" placeholder="S, M, L, XL or 30, 32, 34"/></div>
+        <div class="form-group"><label>Description</label><textarea id="p-desc" rows="3" placeholder="Brief product description...">${p.description||''}</textarea></div>
+        <div class="input-row">
+          <div class="form-group"><label>Stock</label><input id="p-stock" type="number" value="${p.stock||100}"/></div>
+          <div class="form-group"><label>Options</label>
+            <div style="display:flex;gap:16px;margin-top:8px">
+              <label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="p-new" ${p.is_new_arrival?'checked':''}/> New Arrival</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="p-active" ${p.is_active!==0?'checked':''}/> Active</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+        <button class="btn btn-primary" id="save-prod-btn" onclick="saveProduct(${p.id||0})">${isEdit?'Save Changes':'Add Product'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openProductModal() {
+  document.getElementById('product-modal').style.display = 'flex';
+  document.getElementById('p-active').checked = true;
+}
+function closeProductModal() { document.getElementById('product-modal').style.display = 'none'; }
+function openEditModal(p) {
+  document.getElementById('product-modal').innerHTML = '';
+  document.getElementById('main-content').insertAdjacentHTML('beforeend', renderProductModal(p).replace('style="display:none"',''));
+  document.getElementById('product-modal').style.display = 'flex';
+}
+
+async function saveProduct(id) {
+  const btn = document.getElementById('save-prod-btn');
+  const alertEl = document.getElementById('modal-alert');
+  const sizesRaw = document.getElementById('p-sizes').value;
+  const sizes = sizesRaw.split(',').map(s=>s.trim()).filter(Boolean);
+  const body = {
+    name: document.getElementById('p-name').value,
+    price: parseInt(document.getElementById('p-price').value),
+    category: document.getElementById('p-cat').value,
+    type: document.getElementById('p-type').value,
+    image: document.getElementById('p-img').value,
+    sizes,
+    description: document.getElementById('p-desc').value,
+    stock: parseInt(document.getElementById('p-stock').value)||100,
+    is_new_arrival: document.getElementById('p-new').checked,
+    is_active: document.getElementById('p-active').checked,
+  };
+  if (!body.name||!body.price||!body.image||!sizes.length) {
+    alertEl.innerHTML = '<div class="alert alert-error">Please fill in all required fields</div>';
+    return;
+  }
+  btn.disabled = true; btn.innerHTML = '<span class="loading"></span> Saving...';
+  try {
+    if (id) await api(`/products/${id}`, 'PUT', body);
+    else await api('/products', 'POST', body);
+    closeProductModal();
+    document.getElementById('product-alert').innerHTML = `<div class="alert alert-success">Product ${id?'updated':'added'} successfully!</div>`;
+    setTimeout(() => renderProducts(document.getElementById('main-content')), 300);
+  } catch(e) {
+    alertEl.innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+    btn.disabled=false; btn.textContent = id?'Save Changes':'Add Product';
+  }
+}
+
+async function deleteProduct(id, name) {
+  if(!confirm(`Delete "${name}"? This will hide it from the store.`)) return;
+  try {
+    await api(`/products/${id}`, 'DELETE');
+    renderProducts(document.getElementById('main-content'));
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ─── ORDERS ───────────────────────────────────────────────────────────────────
+async function renderOrders(c) {
+  const orders = await api('/orders');
+  pendingCount = orders.filter(o=>o.status==='pending').length;
+  
+  c.innerHTML = `
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div><div class="page-title">Orders</div><div class="page-sub">${orders.length} total orders</div></div>
+      <div class="flex gap-2 items-center">
+        <select class="select-sm" id="status-filter" onchange="filterOrders(this.value)">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+    <div id="orders-alert"></div>
+    <div class="card">
+      <table id="orders-table">
+        <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Date</th><th>Status</th><th>Update</th></tr></thead>
+        <tbody>
+          ${orders.map(o=>`
+            <tr data-status="${o.status}">
+              <td style="font-weight:700">#${o.id}</td>
+              <td>
+                <div style="font-weight:600">${o.customer_name}</div>
+                <div style="font-size:12px;color:var(--gray-500)">${o.customer_email}</div>
+                ${o.customer_phone?`<div style="font-size:12px;color:var(--gray-500)">${o.customer_phone}</div>`:''}
+              </td>
+              <td>
+                ${(o.items||[]).map(i=>`<div style="font-size:13px">• ${i.name} (${i.selectedSize})</div>`).join('')}
+              </td>
+              <td style="font-weight:700">LKR ${o.total.toLocaleString()}</td>
+              <td style="font-size:12px;color:var(--gray-500)">${new Date(o.created_at).toLocaleDateString('en-LK',{day:'numeric',month:'short',year:'numeric'})}</td>
+              <td><span class="badge-status badge-${o.status}">${o.status}</span></td>
+              <td>
+                <select class="select-sm" onchange="updateOrderStatus(${o.id},this.value,this)" data-current="${o.status}">
+                  ${['pending','confirmed','processing','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${s===o.status?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+                </select>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function filterOrders(status) {
+  document.querySelectorAll('#orders-table tbody tr').forEach(tr => {
+    tr.style.display = (!status || tr.dataset.status === status) ? '' : 'none';
+  });
+}
+
+async function updateOrderStatus(id, status, sel) {
+  const prev = sel.dataset.current;
+  try {
+    await api(`/orders/${id}/status`, 'PUT', { status });
+    sel.dataset.current = status;
+    const row = sel.closest('tr');
+    row.querySelector('.badge-status').className = `badge-status badge-${status}`;
+    row.querySelector('.badge-status').textContent = status;
+    row.dataset.status = status;
+    document.getElementById('orders-alert').innerHTML = `<div class="alert alert-success">Order #${id} updated to ${status}</div>`;
+    setTimeout(() => document.getElementById('orders-alert').innerHTML='', 3000);
+  } catch(e) {
+    sel.value = prev;
+    alert('Error: ' + e.message);
+  }
+}
+
+// ─── MESSAGES ─────────────────────────────────────────────────────────────────
+async function renderMessages(c) {
+  const messages = await api('/contact');
+  unreadCount = messages.filter(m=>!m.is_read).length;
+  
+  c.innerHTML = `
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div><div class="page-title">Messages</div><div class="page-sub">${messages.length} messages, ${unreadCount} unread</div></div>
+    </div>
+    <div id="msg-alert"></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${messages.map(m=>`
+            <tr style="${!m.is_read?'background:#fffbeb':''}" id="msg-row-${m.id}">
+              <td>
+                <div style="font-weight:600">${m.name}</div>
+                <a href="mailto:${m.email}" style="font-size:12px;color:var(--olive)">${m.email}</a>
+              </td>
+              <td style="font-weight:${m.is_read?'400':'700'}">${m.subject}</td>
+              <td style="max-width:250px;color:var(--gray-500);font-size:13px">${m.message.slice(0,100)}${m.message.length>100?'…':''}</td>
+              <td style="font-size:12px;color:var(--gray-500);white-space:nowrap">${new Date(m.created_at).toLocaleDateString()}</td>
+              <td><span class="badge-status ${m.is_read?'badge-read':'badge-unread'}">${m.is_read?'Read':'New'}</span></td>
+              <td>
+                <div class="flex gap-2">
+                  ${!m.is_read?`<button class="btn btn-sm btn-secondary" onclick="markRead(${m.id})">Mark Read</button>`:''}
+                  <button class="btn btn-sm btn-danger" onclick="deleteMessage(${m.id})">Delete</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function markRead(id) {
+  try {
+    await api(`/contact/${id}/read`, 'PUT');
+    const row = document.getElementById(`msg-row-${id}`);
+    row.style.background = '';
+    row.querySelector('.badge-status').className = 'badge-status badge-read';
+    row.querySelector('.badge-status').textContent = 'Read';
+    const btn = row.querySelector('.btn-secondary');
+    if(btn) btn.remove();
+  } catch(e) { alert(e.message); }
+}
+
+async function deleteMessage(id) {
+  if(!confirm('Delete this message?')) return;
+  try {
+    await api(`/contact/${id}`, 'DELETE');
+    document.getElementById(`msg-row-${id}`).remove();
+  } catch(e) { alert(e.message); }
+}
+
+// ─── NEWSLETTER ───────────────────────────────────────────────────────────────
+async function renderNewsletter(c) {
+  const subs = await api('/newsletter');
+  
+  c.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Newsletter Subscribers</div>
+      <div class="page-sub">${subs.length} subscribers</div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Subscribers</span>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-bar" placeholder="Search emails..." oninput="filterTable('sub-table',this.value,[0])"/>
+        </div>
+      </div>
+      <table id="sub-table">
+        <thead><tr><th>Email</th><th>Subscribed On</th></tr></thead>
+        <tbody>
+          ${subs.map(s=>`
+            <tr>
+              <td><a href="mailto:${s.email}" style="color:var(--olive)">${s.email}</a></td>
+              <td style="color:var(--gray-500)">${new Date(s.subscribed_at).toLocaleDateString('en-LK',{year:'numeric',month:'long',day:'numeric'})}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ─── USERS ────────────────────────────────────────────────────────────────────
+async function renderUsers(c) {
+  const users = await api('/admin/users');
+  
+  c.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Users</div>
+      <div class="page-sub">${users.length} registered users</div>
+    </div>
+    <div id="users-alert"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Users</span>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-bar" placeholder="Search users..." oninput="filterTable('users-table',this.value,[0,1])"/>
+        </div>
+      </div>
+      <table id="users-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${users.map(u=>`
+            <tr id="user-row-${u.id}">
+              <td style="font-weight:600">${u.name}</td>
+              <td style="color:var(--gray-500)">${u.email}</td>
+              <td><span class="badge-status ${u.role==='admin'?'badge-delivered':'badge-confirmed'}">${u.role}</span></td>
+              <td style="font-size:12px;color:var(--gray-500)">${new Date(u.created_at).toLocaleDateString()}</td>
+              <td>${u.role!=='admin'?`<button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id},'${u.name}')">Delete</button>`:''}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function deleteUser(id, name) {
+  if(!confirm(`Delete user "${name}"?`)) return;
+  try {
+    await api(`/admin/users/${id}`, 'DELETE');
+    document.getElementById(`user-row-${id}`).remove();
+    document.getElementById('users-alert').innerHTML = '<div class="alert alert-success">User deleted</div>';
+    setTimeout(() => document.getElementById('users-alert').innerHTML='', 3000);
+  } catch(e) { alert(e.message); }
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function filterTable(tableId, query, cols) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    const cells = [...tr.cells];
+    const match = cols.some(i => cells[i]?.textContent.toLowerCase().includes(q));
+    tr.style.display = match ? '' : 'none';
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
