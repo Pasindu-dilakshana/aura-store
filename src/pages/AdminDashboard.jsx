@@ -23,7 +23,6 @@ function Sidebar({ open, onClose }) {
     { to: '/admin/messages', label: 'Messages', icon: <MessageSquare size={18} /> },
     { to: '/admin/newsletter', label: 'Newsletter', icon: <Mail size={18} /> },
     { to: '/admin/users', label: 'Users', icon: <Users size={18} /> },
-    { to: '/admin/story', label: 'About Page', icon: <BookOpen size={18} /> },
   ];
 
   const isActive = (to, exact) => exact ? location.pathname === to : location.pathname.startsWith(to) && to !== '/admin';
@@ -783,7 +782,6 @@ export default function AdminDashboard() {
       <Route path="messages" element={<Messages />} />
       <Route path="newsletter" element={<Newsletter />} />
       <Route path="users" element={<AdminUsers />} />
-      <Route path="story" element={<Story />} />
     </Routes>
   );
 }
