@@ -28,7 +28,7 @@ export default function Navbar({ cartCount, toggleCart }) {
         </button>
 
         <Link to="/" className="flex items-center gap-3">
-          <img src="/logo1.png" alt="LIMA logo" className="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-white p-1" />
+          <img src="/logo1.png" alt="LIMA logo" className="w-12 h-12 object-contain rounded-2xl bg-white p-1.5 shadow-[0_6px_20px_rgba(0,0,0,0.12)]" />
           <div className="text-2xl font-serif font-bold tracking-tighter">LIMA<span className="text-olive-600">.</span></div>
         </Link>
 
@@ -99,7 +99,7 @@ export default function Navbar({ cartCount, toggleCart }) {
           <div className="relative bg-white w-4/5 max-w-sm h-screen overflow-y-auto shadow-2xl flex flex-col">
             <div className="flex justify-between items-center px-6 py-5 border-b sticky top-0 bg-white z-10">
               <span className="flex items-center gap-3 font-serif text-xl font-bold">
-                <img src="/logo1.png" alt="LIMA logo" className="w-11 h-11 object-contain rounded-lg border border-gray-200 bg-white p-1" />
+                <img src="/logo1.png" alt="LIMA logo" className="w-11 h-11 object-contain rounded-2xl bg-white p-1.5 shadow-[0_6px_20px_rgba(0,0,0,0.12)]" />
                 LIMA<span className="text-olive-600">.</span>
               </span>
               <button onClick={closeMenu} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
