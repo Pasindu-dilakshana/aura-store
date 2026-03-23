@@ -33,7 +33,7 @@ function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />}
       <aside className={`fixed top-0 left-0 h-screen w-64 bg-gray-900 text-white flex flex-col z-50 transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-800">
-          <Link to="/" className="text-2xl font-serif font-bold">AURA<span className="text-green-400">.</span></Link>
+          <Link to="/" className="text-2xl font-serif font-bold">LIMA<span className="text-green-400">.</span></Link>
           <button onClick={onClose} className="lg:hidden p-1 hover:bg-gray-800 rounded"><X size={18} /></button>
         </div>
         <div className="px-3 py-2 text-xs text-gray-500 uppercase tracking-widest font-bold mt-2">Admin Panel</div>
@@ -592,7 +592,7 @@ function Story() {
                 <label className="block text-sm font-bold mb-1">Title *</label>
                 <input value={form.title} onChange={e => setForm({...form, title: e.target.value})}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black"
-                  placeholder="e.g. How AURA Started" />
+                  placeholder="e.g. How LIMA Started" />
               </div>
               <div>
                 <label className="block text-sm font-bold mb-1">Date</label>

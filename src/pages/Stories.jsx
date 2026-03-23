@@ -30,9 +30,9 @@ export default function Stories() {
     <div className="min-h-screen pb-24 animate-fadeIn">
       {/* Header */}
       <div className="bg-stone-900 text-white py-20 text-center px-4">
-        <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">From AURA</p>
+        <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">From LIMA</p>
         <h1 className="text-5xl font-serif font-bold mb-4">Our Stories</h1>
-        <p className="text-stone-400 max-w-md mx-auto">Day-to-day updates, sales, behind the scenes, and everything AURA.</p>
+        <p className="text-stone-400 max-w-md mx-auto">Day-to-day updates, sales, behind the scenes, and everything LIMA.</p>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 pt-10">

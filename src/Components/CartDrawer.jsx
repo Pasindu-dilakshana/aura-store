@@ -34,14 +34,14 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
     }
 
     // Open WhatsApp
-    let message = `Hi AURA! I'd like to place an order:%0A%0A`;
+    let message = `Hi LIMA! I'd like to place an order:%0A%0A`;
     cart.forEach((item, i) => {
       message += `${i + 1}. ${item.name} (${item.selectedSize}) - LKR ${item.price.toLocaleString()}%0A`;
     });
     message += `%0A*Total: LKR ${total.toLocaleString()}*%0A%0AName: ${name}%0AEmail: ${email}`;
     if (phone) message += `%0APhone: ${phone}`;
 
-    window.open(`https://wa.me/94771234567?text=${message}`, '_blank');
+    window.open(`https://wa.me/0787888450?text=${message}`, '_blank');
     clearCart();
     setStep('cart');
     setLoading(false);

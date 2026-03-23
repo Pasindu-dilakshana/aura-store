@@ -42,7 +42,7 @@ app.use((err, req, res, next) => { console.error(err); res.status(500).json({ er
 // Connect DB first, then start server
 const { connect } = require('./db/database');
 connect().then(() => {
-  app.listen(PORT, () => console.log(`\n🚀 AURA Backend running at http://localhost:${PORT}\n`));
+  app.listen(PORT, () => console.log(`\n🚀 LIMA Backend running at http://localhost:${PORT}\n`));
 }).catch(err => {
   console.error('Failed to start:', err);
   process.exit(1);

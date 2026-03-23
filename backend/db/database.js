@@ -51,7 +51,7 @@ function loadFromFile() {
 }
 
 function emptyDb() {
-  return { users: [], products: [], orders: [], contacts: [], newsletter: [], posts: [], story: { title: 'Our Story', content: 'The journey, the people, and the moments that shaped AURA.' } };
+  return { users: [], products: [], orders: [], contacts: [], newsletter: [], posts: [], story: { title: 'Our Story', content: 'The journey, the people, and the moments that shaped LIMA.' } };
 }
 
 // ─── Public API (sync - same interface as before) ─────────────────────────────
@@ -130,7 +130,7 @@ async function seedProducts() {
     { id: 30, name: "Lounge Pants",               price: 2900,  category: "Weekly Favorites", type: "Local Brand 🇱🇰",  image: "https://images.unsplash.com/photo-1506629082632-cc4caf5fcda1?q=80&w=800", sizes: ["S","M","L"],          description: "Comfortable casual style.",              stock: 100, is_active: true, is_new_arrival: false, is_weekly_favorite: true,  created_at: now }
   ];
   if (!data.story || !data.story.title) {
-    data.story = { title: 'Our Story', content: 'It all began in a small room in Colombo. Two friends passionate about fashion decided Sri Lanka deserved a clothing brand that truly reflected its culture while keeping up with global trends. AURA was born.' };
+    data.story = { title: 'Our Story', content: 'It all began in a small room in Colombo. Two friends passionate about fashion decided Sri Lanka deserved a clothing brand that truly reflected its culture while keeping up with global trends. LIMA was born.' };
   }
   save(data);
   console.log('✅ Seeded 30 products');

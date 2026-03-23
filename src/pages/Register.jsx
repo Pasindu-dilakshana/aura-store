@@ -32,9 +32,9 @@ export default function Register() {
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />Back
         </button>
         <div className="text-center mb-10">
-          <Link to="/" className="text-3xl font-serif font-bold">AURA<span className="text-olive-600">.</span></Link>
+          <Link to="/" className="text-3xl font-serif font-bold">LIMA<span className="text-olive-600">.</span></Link>
           <h1 className="text-2xl font-bold mt-4 mb-2">Create Account</h1>
-          <p className="text-gray-500 text-sm">Join AURA and track your orders</p>
+          <p className="text-gray-500 text-sm">Join LIMA and track your orders</p>
         </div>
 
         {error && <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">{error}</div>}

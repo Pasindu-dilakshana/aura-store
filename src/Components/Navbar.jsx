@@ -28,7 +28,7 @@ export default function Navbar({ cartCount, toggleCart }) {
         </button>
 
         <Link to="/" className="flex items-center gap-2">
-          <div className="text-2xl font-serif font-bold tracking-tighter">AURA<span className="text-olive-600">.</span></div>
+          <div className="text-2xl font-serif font-bold tracking-tighter">LIMA<span className="text-olive-600">.</span></div>
         </Link>
 
         <div className="hidden md:flex items-center space-x-8">
@@ -97,7 +97,7 @@ export default function Navbar({ cartCount, toggleCart }) {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={closeMenu} />
           <div className="relative bg-white w-4/5 max-w-sm h-screen overflow-y-auto shadow-2xl flex flex-col">
             <div className="flex justify-between items-center px-6 py-5 border-b sticky top-0 bg-white z-10">
-              <span className="font-serif text-xl font-bold">AURA<span className="text-olive-600">.</span></span>
+              <span className="font-serif text-xl font-bold">LIMA<span className="text-olive-600">.</span></span>
               <button onClick={closeMenu} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
             </div>
             <div className="flex flex-col p-4 space-y-1 flex-grow">

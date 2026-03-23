@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { contactApi } from '../api';
-import { ArrowLeft, Send, Check, Loader } from 'lucide-react';
+import { ArrowLeft, Send, Check, Loader, Mail } from 'lucide-react';
 
 export default function Contact() {
+  const contactEmail = 'pasindudilakshana23@gmail.com';
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [loading, setLoading] = useState(false);
@@ -31,6 +32,11 @@ export default function Contact() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-serif font-bold mb-3">Get In Touch</h1>
         <p className="text-gray-500">Have a question or feedback? We'd love to hear from you.</p>
+        <div className="mt-4 inline-flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm">
+          <Mail size={14} className="text-gray-500" />
+          <span className="text-gray-600">Email us directly:</span>
+          <a href={`mailto:${contactEmail}`} className="font-semibold text-black hover:underline">{contactEmail}</a>
+        </div>
       </div>
 
       {sent ? (

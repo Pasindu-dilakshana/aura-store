@@ -14,12 +14,12 @@ async function notifyUsers(product) {
     const t = nodemailer.createTransport({ host: process.env.EMAIL_HOST || 'smtp.gmail.com', port: 587, secure: false, auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS } });
     for (const user of users) {
       await t.sendMail({
-        from: process.env.EMAIL_FROM || `"AURA Store" <${process.env.EMAIL_USER}>`,
+        from: process.env.EMAIL_FROM || `"LIMA Store" <${process.env.EMAIL_USER}>`,
         to: user.email,
-        subject: `✨ New arrival at AURA: ${product.name}`,
+        subject: `✨ New arrival at LIMA: ${product.name}`,
         html: `
           <div style="font-family:sans-serif;max-width:500px;margin:auto">
-            <h2 style="font-family:Georgia,serif">AURA<span style="color:#5a6b3d">.</span></h2>
+            <h2 style="font-family:Georgia,serif">LIMA<span style="color:#5a6b3d">.</span></h2>
             <h3>Hi ${user.name}, something new just dropped! 🎉</h3>
             <img src="${product.image}" style="width:100%;border-radius:8px;margin:12px 0" />
             <h2>${product.name}</h2>
@@ -27,7 +27,7 @@ async function notifyUsers(product) {
             <p style="font-size:20px;font-weight:bold">LKR ${product.price.toLocaleString()}</p>
             <p>Category: ${product.category} &nbsp;|&nbsp; ${product.type}</p>
             <a href="http://localhost:5173" style="display:inline-block;background:#111;color:#fff;padding:12px 28px;border-radius:30px;text-decoration:none;font-weight:bold;margin-top:12px">SHOP NOW</a>
-            <p style="color:#999;font-size:12px;margin-top:24px">You're receiving this because you have an account with AURA Store.</p>
+            <p style="color:#999;font-size:12px;margin-top:24px">You're receiving this because you have an account with LIMA Store.</p>
           </div>`
       });
     }

@@ -69,7 +69,7 @@ export default function StoryPost() {
       </div>
 
       <div className="mt-12 pt-8 border-t text-center">
-        <p className="text-gray-500 text-sm mb-4">More from AURA</p>
+        <p className="text-gray-500 text-sm mb-4">More from LIMA</p>
         <Link to="/stories" className="inline-flex items-center gap-2 bg-black text-white px-8 py-3 rounded-full text-sm font-bold hover:bg-olive-700 transition-colors">
           All Stories
         </Link>

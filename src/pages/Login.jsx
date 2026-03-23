@@ -31,7 +31,7 @@ export default function Login() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-16 animate-fadeIn">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <Link to="/" className="text-3xl font-serif font-bold">AURA<span className="text-olive-600">.</span></Link>
+          <Link to="/" className="text-3xl font-serif font-bold">LIMA<span className="text-olive-600">.</span></Link>
           <h1 className="text-2xl font-bold mt-4 mb-2">Welcome Back</h1>
           <p className="text-gray-500 text-sm">Sign in to your account</p>
         </div>

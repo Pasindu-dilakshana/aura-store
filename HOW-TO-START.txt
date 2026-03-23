@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════╗
-║           AURA STORE — HOW TO START                  ║
+║           LIMA STORE — HOW TO START                  ║
 ╚══════════════════════════════════════════════════════╝
 
 You have 2 servers to run. Open TWO terminal windows.
@@ -12,7 +12,7 @@ TERMINAL 1 — Backend (run this FIRST)
   npm install
   npm run dev
 
-  ✅ Should show: "🚀 AURA Backend running at http://localhost:5000"
+  ✅ Should show: "🚀 LIMA Backend running at http://localhost:5000"
   ✅ Test it: open http://localhost:5000/api/health in browser
 
 

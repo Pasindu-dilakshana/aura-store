@@ -17,7 +17,7 @@ export default function About() {
       {/* Header */}
       <div className="bg-stone-900 text-white py-24 text-center px-4">
         <p className="text-xs font-bold tracking-widest uppercase text-stone-400 mb-3">Est. Sri Lanka</p>
-        <h1 className="text-5xl font-serif font-bold mb-4">About AURA</h1>
+        <h1 className="text-5xl font-serif font-bold mb-4">About LIMA</h1>
         <p className="text-stone-400 max-w-md mx-auto">Quiet luxury, rooted in Sri Lanka.</p>
       </div>
 

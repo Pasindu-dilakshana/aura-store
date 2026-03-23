@@ -1,5 +1,5 @@
 ═══════════════════════════════════════════════════
-        AURA STORE — DEPLOYMENT GUIDE
+      LIMA STORE — DEPLOYMENT GUIDE
     Backend: Render  |  Frontend: Vercel
 ═══════════════════════════════════════════════════
 
@@ -28,7 +28,7 @@ STEP 2 — GITHUB (push your code)
 3. On your computer, open terminal in the aura-complete folder:
    git init
    git add .
-   git commit -m "Initial AURA store"
+   git commit -m "Initial LIMA store"
    git remote add origin https://github.com/YOURUSERNAME/aura-store.git
    git push -u origin main
 
