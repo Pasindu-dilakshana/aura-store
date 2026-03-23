@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, ShoppingBag, Trash2, Loader } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ShoppingBag, Trash2, Loader, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersApi } from '../api';
 
@@ -7,43 +7,83 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
   const total = cart.reduce((sum, item) => sum + item.price, 0);
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(user?.name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [step, setStep] = useState('cart'); // 'cart' | 'details'
+
+  // Auto-fill from logged in user
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
-    if (!name || !email) {
+    if (!name.trim() || !email.trim()) {
       alert('Please enter your name and email');
+      return;
+    }
+    if (!phone.trim()) {
+      alert('Please enter your phone number so we can contact you');
       return;
     }
 
     setLoading(true);
+
+    // Save order to backend
     try {
-      // Save order to backend
       await ordersApi.place({
         customer_name: name,
         customer_email: email,
         customer_phone: phone,
         items: cart,
-        total
+        total,
+        notes: address ? `Delivery address: ${address}` : ''
       });
     } catch (err) {
-      console.warn('Could not save order:', err.message);
+      console.warn('Could not save order to backend:', err.message);
     }
 
-    // Open WhatsApp
-    let message = `Hi LIMA! I'd like to place an order:%0A%0A`;
+    // Build WhatsApp message
+    const lines = [];
+    lines.push('🛍️ *New Order from AURA Store*');
+    lines.push('━━━━━━━━━━━━━━━━━━━━');
+    lines.push('');
+    lines.push('*🧾 ORDER ITEMS:*');
     cart.forEach((item, i) => {
-      message += `${i + 1}. ${item.name} (${item.selectedSize}) - LKR ${item.price.toLocaleString()}%0A`;
+      lines.push(`${i + 1}. *${item.name}*`);
+      lines.push(`   • Size: ${item.selectedSize}`);
+      lines.push(`   • Category: ${item.category || ''}`);
+      lines.push(`   • Price: LKR ${item.price.toLocaleString()}`);
+      lines.push('');
     });
-    message += `%0A*Total: LKR ${total.toLocaleString()}*%0A%0AName: ${name}%0AEmail: ${email}`;
-    if (phone) message += `%0APhone: ${phone}`;
+    lines.push('━━━━━━━━━━━━━━━━━━━━');
+    lines.push(`💰 *TOTAL: LKR ${total.toLocaleString()}*`);
+    lines.push('━━━━━━━━━━━━━━━━━━━━');
+    lines.push('');
+    lines.push('*👤 CUSTOMER DETAILS:*');
+    lines.push(`• Name: ${name}`);
+    lines.push(`• Email: ${email}`);
+    lines.push(`• Phone: ${phone}`);
+    if (address.trim()) {
+      lines.push(`• Address: ${address}`);
+    }
+    lines.push('');
+    lines.push('_Please confirm this order. Thank you! 🙏_');
 
-    window.open(`https://wa.me/0787888450?text=${message}`, '_blank');
+    const message = encodeURIComponent(lines.join('\n'));
+    window.open(`https://wa.me/94787888450?text=${message}`, '_blank');
+
     clearCart();
     setStep('cart');
+    setName(user?.name || '');
+    setEmail(user?.email || '');
+    setPhone('');
+    setAddress('');
     setLoading(false);
     onClose();
   };
@@ -54,6 +94,7 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white w-full max-w-md h-full shadow-2xl flex flex-col">
+
         {/* Header */}
         <div className="p-6 border-b flex justify-between items-center">
           <h2 className="font-serif text-xl font-bold flex items-center gap-2">
@@ -77,7 +118,8 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
                 <img src={item.image} className="w-20 h-24 object-cover rounded-lg" alt={item.name} />
                 <div className="flex-1">
                   <h4 className="font-medium text-gray-900">{item.name}</h4>
-                  <p className="text-sm text-gray-500 mt-0.5">Size: {item.selectedSize}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{item.category}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">Size: <span className="font-semibold">{item.selectedSize}</span></p>
                   <div className="flex justify-between items-center mt-2">
                     <p className="font-semibold">LKR {item.price.toLocaleString()}</p>
                     <button onClick={() => removeFromCart(idx)} className="text-red-500 hover:text-red-600 p-1">
@@ -93,11 +135,13 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
         {/* Checkout Section */}
         {cart.length > 0 && (
           <div className="p-6 bg-gray-50 border-t space-y-4">
+
+            {/* Customer Details Form */}
             {step === 'details' && (
               <div className="space-y-3">
                 <input
                   value={name} onChange={e => setName(e.target.value)}
-                  placeholder="Your full name *"
+                  placeholder="Full name *"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black"
                 />
                 <input
@@ -106,18 +150,28 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black"
                 />
                 <input
-                  value={phone} onChange={e => setPhone(e.target.value)}
-                  placeholder="Phone number (optional)"
+                  value={phone} onChange={e => setPhone(e.target.value)} type="tel"
+                  placeholder="Phone number * (e.g. 077 123 4567)"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black"
                 />
+                <div className="relative">
+                  <MapPin size={15} className="absolute left-3 top-3.5 text-gray-400" />
+                  <input
+                    value={address} onChange={e => setAddress(e.target.value)}
+                    placeholder="Delivery address (optional)"
+                    className="w-full border border-gray-300 rounded-lg pl-9 pr-4 py-3 text-sm focus:outline-none focus:border-black"
+                  />
+                </div>
               </div>
             )}
 
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-600">Subtotal</span>
+            {/* Total */}
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Subtotal ({cart.length} {cart.length === 1 ? 'item' : 'items'})</span>
               <span className="font-bold">LKR {total.toLocaleString()}</span>
             </div>
 
+            {/* Buttons */}
             {step === 'cart' ? (
               <button
                 onClick={() => setStep('details')}
@@ -143,6 +197,10 @@ export default function CartDrawer({ isOpen, onClose, cart, removeFromCart, clea
                 </button>
               </div>
             )}
+
+            <p className="text-xs text-center text-gray-400">
+              You'll be redirected to WhatsApp to confirm your order with us
+            </p>
           </div>
         )}
       </div>

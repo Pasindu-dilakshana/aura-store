@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getHeaders = () => {
-  const token = localStorage.getItem('lima_token');
+  const token = localStorage.getItem('aura_token');
   return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
 };
 
@@ -50,6 +50,12 @@ export const adminApi = {
   stats: () => apiFetch('/admin/stats'),
   users: () => apiFetch('/admin/users'),
   deleteUser: (id) => apiFetch(`/admin/users/${id}`, { method: 'DELETE' }),
+  getStories: () => apiFetch('/admin/stories'),
+  createStory: (body) => apiFetch('/admin/stories', { method: 'POST', body: JSON.stringify(body) }),
+  updateStory: (id, body) => apiFetch(`/admin/stories/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteStory: (id) => apiFetch(`/admin/stories/${id}`, { method: 'DELETE' }),
+  getStory: () => apiFetch('/story'),
+  updateAbout: (body) => apiFetch('/admin/story', { method: 'PUT', body: JSON.stringify(body) }),
 };
 
 export const postsApi = {
