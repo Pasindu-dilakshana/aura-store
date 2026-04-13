@@ -1,16 +1,43 @@
-# React + Vite
+# LIMA Store 🛍️
+### Quiet Luxury — Sri Lankan Fashion Store
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack e-commerce clothing store built from scratch.
 
-Currently, two official plugins are available:
+🔗 **Live Site:** https://aura-store-six.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
+- **Frontend:** React 19, Vite, TailwindCSS, React Router
+- **Backend:** Node.js, Express.js, JWT Authentication
+- **Database:** MongoDB Atlas
+- **Deployed:** Vercel (frontend) + Render (backend)
 
-## React Compiler
+## Features
+- 🛒 Shopping cart with WhatsApp ordering
+- 👤 User registration & login (JWT)
+- 🛠️ Full admin dashboard (products, orders, users, messages)
+- 📝 Blog/Stories system for daily updates
+- 📧 Email notifications for new product drops
+- 📱 Fully responsive design
+- ✨ New Arrivals & Weekly Favorites sections
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Admin Dashboard
+- Manage products (add/edit/delete)
+- View and update order status
+- Read customer messages
+- Manage newsletter subscribers
+- Write blog posts and announcements
 
-## Expanding the ESLint configuration
+## Getting Started
+```bash
+# Backend
+cd backend
+npm install
+node server.js
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# Frontend
+npm install
+npm run dev
+```
+
+## Environment Variables
+See `backend/.env.example` for required variables including MongoDB URI and JWT secret.
